@@ -40,7 +40,10 @@ export default function (pi: ExtensionAPI) {
     try {
       const agentsSrc = resolve(moduleDir(), "..", "agents");
       const agentsDest = join(getAgentDir(), "agents");
-      if (!existsSync(agentsSrc)) return;
+      if (!existsSync(agentsSrc)) {
+        console.error(`[pi-agentic-harness] seed skipped: agents dir tak ada di ${agentsSrc}`);
+        return;
+      }
 
       mkdirSync(agentsDest, { recursive: true });
       let installed = 0;
