@@ -173,6 +173,7 @@ function hasCycle(nodes: Record<string, PlanNode>, id: string, deps: string[]): 
 }
 
 export default function (pi: ExtensionAPI) {
+  console.error("[dbg] factory ENTERED, typeof import.meta =", typeof import.meta);
   pi.registerTool({
     name: "harness_plan_open",
     label: "Harness: Open Plan",
@@ -363,6 +364,7 @@ function moduleDir(): string {
 
 /** Salin definisi agent bawaan ke pool agent user bila belum ada. */
 function seedAgents(): void {
+  console.error("[dbg] seedAgents ENTERED");
   try {
     const agentsSrc = path.resolve(moduleDir(), "..", "agents");
     const agentsDest = path.join(getAgentDir(), "agents");
