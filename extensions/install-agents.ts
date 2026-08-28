@@ -36,6 +36,7 @@ function moduleDir(): string {
 }
 
 export default function (pi: ExtensionAPI) {
+  console.error("[pi-agentic-harness] install-agents factory LOADED");
   pi.on("session_start", () => {
     try {
       const agentsSrc = resolve(moduleDir(), "..", "agents");
