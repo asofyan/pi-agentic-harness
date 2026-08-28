@@ -1,0 +1,20 @@
+{
+  "name": "pi-agentic-harness",
+  "version": "1.0.0",
+  "description": "Fryxell-style harness backbone for pi: plan/DAG/budget/verification tools plus 8 phase-aligned sub-agents (explore/plan/worker/critic/promoter).",
+  "keywords": ["pi-package", "pi", "agents", "subagent", "harness", "orchestration", "fryxell", "planner", "worker", "critic", "promoter"],
+  "license": "MIT",
+  "author": "Ahmad Sofyan <asofyan@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asofyan/pi-agentic-harness.git"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*",
+    "typebox": "*"
+  },
+  "pi": {
+    "extensions": ["./extensions"]
+  }
+}
