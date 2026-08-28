@@ -12,7 +12,7 @@ series (planner/worker/critic separation, DAG plans, budgets, verification hiera
 | Part | What it does |
 |------|--------------|
 | `extensions/index.ts` | Registers **5 harness tools** callable by the orchestrator *and* any sub-agent: `harness_plan_open`, `harness_add_node`, `harness_node_status`, `harness_plan_status`, `harness_plan_report`. Plan state lives in `<project>/.harness/plan.json` (atomic writes + cross-process file lock). |
-| `extensions/install-agents.ts` | Seeds `agents/*.md` into `~/.pi/agent/agents/` on `session_start`. **Idempotent & non-destructive** — existing agent files (incl. your customizations) are never overwritten. |
+| `extensions/index.ts` (agent seeding) | After registering the tools, the same extension seeds `agents/*.md` into `~/.pi/agent/agents/` on `session_start`. **Idempotent & non-destructive** — existing agent files (incl. your customizations) are never overwritten. |
 | `agents/*.md` | **8 phase-aligned sub-agent definitions** mapping to the Fryxell arc, each with a mandatory *Harness Protocol* (open plan → mark node running → do work → mark done/failed with evidence): |
 
 | Agent | Phase (Fryxell) | Model (default) |
@@ -73,8 +73,7 @@ retry), `transient` → retry with backoff, `tool_misuse` → self-correct, `fat
 pi-agentic-harness/
 ├── package.json          # pi manifest (extensions only; agents ship as data + installer)
 ├── extensions/
-│   ├── index.ts          # harness_* tools
-│   └── install-agents.ts # agent seeding (idempotent)
+│   └── index.ts          # harness_* tools + agent seeding (idempotent)
 └── agents/               # 8 agent definitions (source of truth)
 ```
 

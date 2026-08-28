@@ -17,7 +17,8 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { fileURLToPath } from "node:url";
+import { getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 
@@ -329,4 +330,54 @@ export default function (pi: ExtensionAPI) {
       });
     },
   });
+
+    // ------------------------------------------------------------------ #
+    // Agent seeding — distribusikan definisi agent (agents/*.md) ke pool
+    // agent user (~/.pi/agent/agents/). Idempotent & non-destruktif: file
+    // yang sudah ada (termasuk kustomisasi user) TIDAK pernah ditimpa.
+    // ------------------------------------------------------------------ #
+
+  pi.on("session_start", () => {
+    try {
+      const agentsSrc = path.resolve(moduleDir(), "..", "agents");
+      const agentsDest = path.join(getAgentDir(), "agents");
+      if (!fs.existsSync(agentsSrc)) {
+        console.error(`[pi-agentic-harness] seed skipped: agents dir not found at ${agentsSrc}`);
+        return;
+      }
+      fs.mkdirSync(agentsDest, { recursive: true });
+      let installed = 0;
+      for (const file of fs.readdirSync(agentsSrc)) {
+        if (!file.endsWith(".md")) continue;
+        if (!fs.statSync(path.join(agentsSrc, file)).isFile()) continue;
+        const dest = path.join(agentsDest, file);
+        if (fs.existsSync(dest)) continue; // never overwrite existing definitions
+        fs.copyFileSync(path.join(agentsSrc, file), dest);
+        installed++;
+      }
+      if (installed > 0) {
+        console.log(`[pi-agentic-harness] installed ${installed} agent definition(s) into ${agentsDest}`);
+      }
+    } catch (err) {
+      console.error("[pi-agentic-harness] failed to seed agents:", err);
+    }
+  });
+}
+
+/**
+ * Directory of this extension file (works under jiti ESM and CJS).
+ */
+function moduleDir(): string {
+  try {
+    if (typeof import.meta !== "undefined" && typeof import.meta.url === "string") {
+      return fileURLToPath(new URL(".", import.meta.url));
+    }
+  } catch {
+    /* fall through to CJS */
+  }
+  try {
+    return typeof __dirname === "string" ? __dirname : process.cwd();
+  } catch {
+    return process.cwd();
+  }
 }
