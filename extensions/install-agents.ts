@@ -14,20 +14,25 @@
 
 import { mkdirSync, copyFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-/** Directory of THIS extension file (works under jiti ESM/CJS). */
+/** Directory of THIS extension file (works under jiti ESM and CJS). */
 function moduleDir(): string {
   try {
-    // @ts-expect-error import.meta may not be typed in CJS contexts
-    if (typeof import.meta !== "undefined" && import.meta.url) {
-      const { fileURLToPath } = require("node:url") as typeof import("node:url");
+    // jiti/ESM: import.meta tersedia
+    if (typeof import.meta !== "undefined" && typeof import.meta.url === "string") {
       return fileURLToPath(new URL(".", import.meta.url));
     }
   } catch {
-    /* fall through to CJS */
+    /* lanjut ke CJS */
   }
-  return __dirname;
+  try {
+    // CJS
+    return typeof __dirname === "string" ? __dirname : process.cwd();
+  } catch {
+    return process.cwd();
+  }
 }
 
 export default function (pi: ExtensionAPI) {
